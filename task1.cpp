@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 class Matrix {
 public:
     pair<int, int> size;
@@ -163,7 +162,7 @@ public:
 };
 
 
-#define GNUPLOT_NAME "C:\\gnuplot\\bin\\gnuplot -persist"
+#define GNUPLOT_NAME "/usr/bin/gnuplot -persist"
 
 int main() {
     std::cout << std::setprecision(4) << std::fixed;
@@ -196,32 +195,27 @@ int main() {
     Matrix x = A_TA_1 * A_TB;
     cout << A_TA_1 * A_TB;
 
-    FILE* pipe = _popen(GNUPLOT_NAME, "w");
+    FILE* pipe = popen(GNUPLOT_NAME, "w");
 
     if (pipe == NULL) {
         cout << "Pipe failed" << endl;
         return 0;
     }
 
-    // Setup GNUPlot
-    fprintf(pipe, "set xtics 1\n");
-    fprintf(pipe, "set ytics 1\n");
     fprintf(pipe, "set grid xtics ytics\n");
-
-    // Function print
     string response = "plot ";
 
     for(int i = x.matrix.size() - 1; i > 0; i--) {
         response += to_string(x.matrix[i][0]) + "*x**" + to_string(i);
-        if(x.matrix[i][0] < 0) {
+        if(x.matrix[i - 1][0] >= 0) {
             response += "+";
         }
     }
-    response += to_string(x.matrix[x.matrix.size() - 1][0]);
+    response += to_string(x.matrix[0][0]);
 
     cout << response << endl;
 
-    response += " with lines, '-' with points pointtype 6 pointsize 1";
+    response += " with lines, '-' with points pointtype 6 pointsize 1\n";
 
     // Print points
     fprintf(pipe, "%s", response.c_str());
